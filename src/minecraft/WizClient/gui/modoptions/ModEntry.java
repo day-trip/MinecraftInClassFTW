@@ -22,7 +22,7 @@ public class ModEntry implements GuiListExtended.IGuiListEntry, Comparable<ModEn
 	
 	@Override
 	public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected) {
-		this.checkbox.xPosition = x + 200;
+		this.checkbox.x = x + 200;
 		this.checkbox.yPosition = y;
 		this.checkbox.drawButton(Minecraft.getMinecraft(), mouseX, mouseY);
 		this.mod.setEnabled(this.checkbox.isChecked());

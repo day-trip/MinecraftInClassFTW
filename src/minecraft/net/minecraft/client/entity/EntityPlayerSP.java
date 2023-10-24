@@ -1,5 +1,7 @@
 package net.minecraft.client.entity;
 
+import com.mojang.authlib.GameProfile;
+
 import WizClient.mods.impl.ToggleSprintAndSneak.WizClientMovementInput;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.MovingSoundMinecartRiding;
@@ -128,9 +130,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
     /** The amount of time an entity has been in a Portal the previous tick */
     public float prevTimeInPortal;
 
-    public EntityPlayerSP(Minecraft mcIn, World worldIn, NetHandlerPlayClient netHandler, StatFileWriter statFile)
+    public EntityPlayerSP(Minecraft mcIn, World worldIn, NetHandlerPlayClient netHandler, GameProfile profile, StatFileWriter statFile)
     {
-        super(worldIn, netHandler.getGameProfile());
+        super(worldIn, profile, false);
         this.sendQueue = netHandler;
         this.statWriter = statFile;
         this.mc = mcIn;

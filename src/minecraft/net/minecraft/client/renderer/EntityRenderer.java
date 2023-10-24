@@ -22,16 +22,19 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.gson.JsonSyntaxException;
 
+import WizClient.LoadingPopup;
 import WizClient.event.impl.RenderEvent;
-import WizClient.ui.WizClientMainMenu;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBed;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiDownloadTerrain;
+import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.MapItemRenderer;
 import net.minecraft.client.gui.ScaledResolution;
@@ -2438,6 +2441,7 @@ public class EntityRenderer implements IResourceManagerReloadListener
      */
     private void setupFog(int startCoords, float partialTicks)
     {
+    	if (startCoords != -1) return;
         this.fogStandard = false;
         Entity entity = this.mc.getRenderViewEntity();
         boolean flag = false;
@@ -2712,9 +2716,9 @@ public class EntityRenderer implements IResourceManagerReloadListener
             }
         }
 
-        if (this.mc.currentScreen instanceof WizClientMainMenu)
+        if (this.mc.currentScreen instanceof GuiMainMenu)
         {
-            this.updateMainMenu((WizClientMainMenu)this.mc.currentScreen);
+            this.updateMainMenu((GuiMainMenu)this.mc.currentScreen);
         }
 
         if (this.updatedWorld != world)
@@ -2752,7 +2756,7 @@ public class EntityRenderer implements IResourceManagerReloadListener
         }
     }
 
-    private void updateMainMenu(WizClientMainMenu p_updateMainMenu_1_)
+    private void updateMainMenu(GuiMainMenu p_updateMainMenu_1_)
     {
         try
         {

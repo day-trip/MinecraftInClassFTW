@@ -55,15 +55,16 @@ import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 
 import WizClient.Client;
+import WizClient.ScreenTripper;
 import WizClient.event.impl.ClientTickEvent;
 import WizClient.gui.SplashProgress;
 import WizClient.mods.impl.ToggleSprintAndSneak.WizClientMovementInput;
-import WizClient.ui.WizClientMainMenu;
 import WizClient.util.openauth.microsoft.MicrosoftAuthenticator;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.audio.MusicTicker;
 import net.minecraft.client.audio.SoundHandler;
+import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiChat;
@@ -71,6 +72,7 @@ import net.minecraft.client.gui.GuiControls;
 import net.minecraft.client.gui.GuiGameOver;
 import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.client.gui.GuiIngameMenu;
+import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiMemoryErrorScreen;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSleepMP;
@@ -186,6 +188,7 @@ import net.minecraft.world.storage.WorldInfo;
 
 public class Minecraft implements IThreadListener, IPlayerUsage
 {
+	private int hitCooldown = 0;
     private static final Logger logger = LogManager.getLogger();
     private static final ResourceLocation locationMojangPng = new ResourceLocation("textures/gui/title/mojang.png");
     public static final boolean isRunningOnMac = Util.getOSType() == Util.EnumOS.OSX;
@@ -479,8 +482,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
     	Client.getInstance().init();
         this.gameSettings = new GameSettings(this, this.mcDataDir);
         
-        // change
-        // MicrosoftAuthenticator.refreshUser(this);
+        MicrosoftAuthenticator.refreshUser(this);
         
         this.defaultResourcePacks.add(this.mcDefaultResourcePack);
         this.startTimerHackThread();
@@ -506,16 +508,17 @@ public class Minecraft implements IThreadListener, IPlayerUsage
         this.refreshResources();
         this.renderEngine = new TextureManager(this.mcResourceManager);
         this.mcResourceManager.registerReloadListener(this.renderEngine);
-        //this.drawSplashScreen(this.renderEngine);
+        this.fontRendererObj = new FontRenderer(this.gameSettings, new ResourceLocation("WizClient/font/ascii.png"), this.renderEngine, false);
         SplashProgress.drawSplash(getTextureManager());
         this.skinManager = new SkinManager(this.renderEngine, new File(this.fileAssets, "skins"), this.sessionService);
         this.saveLoader = new AnvilSaveConverter(new File(this.mcDataDir, "saves"));
         this.mcSoundHandler = new SoundHandler(this.mcResourceManager, this.gameSettings);
         this.mcResourceManager.registerReloadListener(this.mcSoundHandler);
         this.mcMusicTicker = new MusicTicker(this);
+        System.out.println("d1");
         
         //this.fontRendererObj = new FontRenderer(this.gameSettings, new ResourceLocation("textures/font/ascii.png"), this.renderEngine, false);
-        this.fontRendererObj = new FontRenderer(this.gameSettings, new ResourceLocation("WizClient/font/ascii.png"), this.renderEngine, false);
+        // this.fontRendererObj = new FontRenderer(this.gameSettings, new ResourceLocation("WizClient/font/ascii.png"), this.renderEngine, false);
         
         if (this.gameSettings.forceUnicodeFont != null)
         {
@@ -542,6 +545,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
                 }
             }
         });
+        System.out.println("d2");
         this.mouseHelper = new MouseHelper();
         this.checkGLError("Pre startup");
         GlStateManager.enableTexture2D();
@@ -556,17 +560,23 @@ public class Minecraft implements IThreadListener, IPlayerUsage
         GlStateManager.loadIdentity();
         GlStateManager.matrixMode(5888);
         this.checkGLError("Startup");
+        System.out.println("d3");
         this.textureMapBlocks = new TextureMap("textures");
+        System.out.println("d3.1");
         this.textureMapBlocks.setMipmapLevels(this.gameSettings.mipmapLevels);
         this.renderEngine.loadTickableTexture(TextureMap.locationBlocksTexture, this.textureMapBlocks);
         this.renderEngine.bindTexture(TextureMap.locationBlocksTexture);
         this.textureMapBlocks.setBlurMipmapDirect(false, this.gameSettings.mipmapLevels > 0);
+        System.out.println("d3.2");
         SplashProgress.setProgress(2, "Minecraft - ModelManager");
         this.modelManager = new ModelManager(this.textureMapBlocks);
+        System.out.println("d3.2.1");
         this.mcResourceManager.registerReloadListener(this.modelManager);
         this.renderItem = new RenderItem(this.renderEngine, this.modelManager);
+        System.out.println("d3.2.2");
         SplashProgress.setProgress(3, "Minecraft - RenderManager");
         this.renderManager = new RenderManager(this.renderEngine, this.renderItem);
+        System.out.println("d3.3");
         SplashProgress.setProgress(4, "Minecraft - RenderItem");
         this.itemRenderer = new ItemRenderer(this);
         SplashProgress.setProgress(5, "Minecraft - ItemRender");
@@ -575,28 +585,31 @@ public class Minecraft implements IThreadListener, IPlayerUsage
         SplashProgress.setProgress(6, "Minecraft - EntityRender");
         this.mcResourceManager.registerReloadListener(this.entityRenderer);
         this.blockRenderDispatcher = new BlockRendererDispatcher(this.modelManager.getBlockModelShapes(), this.gameSettings);
-        SplashProgress.setProgress(7, "Minecraft - RenderGlobal");
-        this.mcResourceManager.registerReloadListener(this.blockRenderDispatcher);
+        SplashProgress.setProgress(7, "Minecraft - RenderGlobal"); // x
+        System.out.println("d3.4");
+        this.mcResourceManager.registerReloadListener(this.blockRenderDispatcher); // x
         this.renderGlobal = new RenderGlobal(this);
-        this.mcResourceManager.registerReloadListener(this.renderGlobal);
-        this.guiAchievement = new GuiAchievement(this);
-        GlStateManager.viewport(0, 0, this.displayWidth, this.displayHeight);
+        this.mcResourceManager.registerReloadListener(this.renderGlobal); // x
+        this.guiAchievement = new GuiAchievement(this); // x
+        GlStateManager.viewport(0, 0, this.displayWidth, this.displayHeight); // x
         this.effectRenderer = new EffectRenderer(this.theWorld, this.renderEngine);
-        this.checkGLError("Post startup");
-        this.ingameGUI = new GuiIngame(this);
+        this.checkGLError("Post startup"); // x
+        this.ingameGUI = new GuiIngame(this); // x
+        System.out.println("d4");
 
         if (this.serverName != null)
         {
-            this.displayGuiScreen(new GuiConnecting(new WizClientMainMenu(), this, this.serverName, this.serverPort));
+            this.displayGuiScreen(new GuiConnecting(new GuiMainMenu(), this, this.serverName, this.serverPort));
         }
         else
         {
-            this.displayGuiScreen(new WizClientMainMenu());
+            this.displayGuiScreen(new GuiMainMenu());
         }
 
         this.renderEngine.deleteTexture(this.mojangLogo);
         this.mojangLogo = null;
         this.loadingScreen = new LoadingScreenRenderer(this);
+        ScreenTripper.init(this);
 
         if (this.gameSettings.fullScreen && !this.fullscreen)
         {
@@ -614,6 +627,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
         }
 
         this.renderGlobal.makeEntityOutlineShader();
+        System.out.println("d5");
         Client.getInstance().start();
     }
 
@@ -705,7 +719,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
 
     private static boolean isJvm64bit()
     {
-        String[] astring = new String[] {"sun.arch.data.model", "com.ibm.vm.bitmode", "os.arch"};
+        String[] astring = new String[] {"sun.arch.data.model", "com.ibm.vmgi.bitmode", "os.arch"};
 
         for (String s : astring)
         {
@@ -998,14 +1012,14 @@ public class Minecraft implements IThreadListener, IPlayerUsage
 
         if (guiScreenIn == null && this.theWorld == null)
         {
-            guiScreenIn = new WizClientMainMenu();
+            guiScreenIn = new GuiMainMenu();
         }
         else if (guiScreenIn == null && this.thePlayer.getHealth() <= 0.0F)
         {
             guiScreenIn = new GuiGameOver();
         }
 
-        if (guiScreenIn instanceof WizClientMainMenu)
+        if (guiScreenIn instanceof GuiMainMenu)
         {
             this.gameSettings.showDebugProfilerChart = false;
             this.ingameGUI.getChatGUI().clearChatMessages();
@@ -1523,7 +1537,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
         }
     }
 
-    private void clickMouse()
+    public void clickMouse()
     {
         if (this.leftClickCounter <= 0)
         {
@@ -2148,7 +2162,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
             }
             else
             {
-                while (this.gameSettings.keyBindPickBlock.isPressed())
+                while (this.gameSettings.keyBindPickBlock.isPressed()) // DELETE THIS LINE RIGHT NOW
                 {
                     this.clickMouse();
                 }
@@ -2168,6 +2182,11 @@ public class Minecraft implements IThreadListener, IPlayerUsage
             {
                 this.rightClickMouse();
             }
+            
+            /*this.hitCooldown = MathHelper.floor_float((float) (this.hitCooldown + 1) % 2.75f); // 1.75 ticks, not 15 ((1 / CPS) * 20)
+            if ((this.objectMouseOver.entityHit != null && this.objectMouseOver.entityHit instanceof EntityOtherPlayerMP && hitCooldown == 0)) {
+            	this.clickMouse();
+            }*/
 
             this.sendClickBlockToController(this.currentScreen == null && this.gameSettings.keyBindPickBlock.isKeyDown() && this.inGameHasFocus);
         }
@@ -2312,20 +2331,25 @@ public class Minecraft implements IThreadListener, IPlayerUsage
             throw new ReportedException(crashreport);
         }
 
-        this.loadingScreen.displaySavingString(I18n.format("menu.loadingLevel", new Object[0]));
+        // this.loadingScreen.displaySavingString(I18n.format("menu.loadingLevel", new Object[0]));
+        // this.displayGuiScreen(new GuiConnecting(this));
+        ScreenTripper.tripScreen(new GuiConnecting(this));
+        
+        System.out.println("sup' 3");
 
         while (!this.theIntegratedServer.serverIsInRunLoop())
         {
             String s = this.theIntegratedServer.getUserMessage();
 
-            if (s != null)
+            /*if (s != null)
             {
                 this.loadingScreen.displayLoadingString(I18n.format(s, new Object[0]));
             }
             else
             {
                 this.loadingScreen.displayLoadingString("");
-            }
+            }*/
+            // this.displayGuiScreen(new GuiConnecting(this));
 
             try
             {
@@ -2337,7 +2361,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
             }
         }
 
-        this.displayGuiScreen((GuiScreen)null);
+        this.displayGuiScreen(null);
         SocketAddress socketaddress = this.theIntegratedServer.getNetworkSystem().addLocalEndpoint();
         NetworkManager networkmanager = NetworkManager.provideLocalClient(socketaddress);
         networkmanager.setNetHandler(new NetHandlerLoginClient(networkmanager, this, (GuiScreen)null));
@@ -2383,11 +2407,12 @@ public class Minecraft implements IThreadListener, IPlayerUsage
         this.renderViewEntity = null;
         this.myNetworkManager = null;
 
-        if (this.loadingScreen != null)
+        /*if (this.loadingScreen != null)
         {
             this.loadingScreen.resetProgressAndMessage(loadingMessage);
             this.loadingScreen.displayLoadingString("");
-        }
+        }*/
+        this.displayGuiScreen(new GuiConnecting(this));
 
         if (worldClientIn == null && this.theWorld != null)
         {

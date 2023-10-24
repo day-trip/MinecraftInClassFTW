@@ -5,8 +5,8 @@ import java.io.IOException;
 import org.lwjgl.input.Keyboard;
 
 import WizClient.ui.auth.SessionChanger;
-import WizClient.ui.WizClientMainMenu;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.ScaledResolution;
@@ -22,7 +22,7 @@ public class GuiLoginMicrosoft extends GuiScreen {
                 this.mc.displayGuiScreen(new GuiLoginMicrosoft());
             } else {
                 SessionChanger.getInstance().setUserMicrosoft(this.username.getText(), this.password.getText());
-                this.mc.displayGuiScreen(new WizClientMainMenu());
+                this.mc.displayGuiScreen(new GuiMainMenu());
             }
         }
     }

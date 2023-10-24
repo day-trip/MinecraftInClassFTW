@@ -32,9 +32,9 @@ public abstract class AbstractClientPlayer extends EntityPlayer
     private String nameClear = null;
     private static final ResourceLocation TEXTURE_ELYTRA = new ResourceLocation("textures/entity/elytra.png");
 
-    public AbstractClientPlayer(World worldIn, GameProfile playerProfile)
+    public AbstractClientPlayer(World worldIn, GameProfile playerProfile, boolean mock)
     {
-        super(worldIn, playerProfile);
+        super(worldIn, playerProfile, mock);
         this.nameClear = playerProfile.getName();
 
         if (this.nameClear != null && !this.nameClear.isEmpty())
@@ -67,6 +67,9 @@ public abstract class AbstractClientPlayer extends EntityPlayer
     {
         if (this.playerInfo == null)
         {
+        	if (Minecraft.getMinecraft().getNetHandler() == null) {
+        		return null;
+        	}
             this.playerInfo = Minecraft.getMinecraft().getNetHandler().getPlayerInfo(this.getUniqueID());
         }
 

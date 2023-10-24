@@ -2,48 +2,41 @@ package net.minecraft.client.gui;
 
 import java.io.IOException;
 
-import WizClient.gui.GuiMultiplayerIngame;
+import WizClient.Palette;
 import WizClient.gui.ModListGui;
 import WizClient.gui.modoptions.GuiModToggle;
-import WizClient.ui.WizClientMainMenu;
-import net.minecraft.client.gui.achievement.GuiAchievements;
 import net.minecraft.client.gui.achievement.GuiStats;
+import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.resources.I18n;
+import net.minecraft.util.MathHelper;
 
 public class GuiIngameMenu extends GuiScreen
 {
-    private int field_146445_a;
-    private int field_146444_f;
-
+	protected final int LEFT_START = 36;
+	protected final int WIDTH;
+	
+	public GuiIngameMenu() {
+		super();
+		WIDTH = width > 1000 ? 175 : 150;
+	}
+	
     /**
      * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
      * window resizes, the buttonList is cleared beforehand.
      */
     public void initGui()
     {
-    	
-        this.field_146445_a = 0;
         this.buttonList.clear();
-        int i = -16;
-        int j = 98;
-        this.buttonList.add(new GuiButton(1, this.width / 2 - 100, this.height / 4 + 120 + i, I18n.format("menu.returnToMenu", new Object[0])));
-
-        if (!this.mc.isIntegratedServerRunning())
-        {
-            ((GuiButton)this.buttonList.get(0)).displayString = I18n.format("menu.disconnect", new Object[0]);
-        }
-
-        this.buttonList.add(new GuiButton(4, this.width / 2 - 100, this.height / 4 + 24 + i, I18n.format("menu.returnToGame", new Object[0])));
-        this.buttonList.add(new GuiButton(0, this.width / 2 - 100, this.height / 4 + 96 + i, 98, 20, I18n.format("menu.options", new Object[0])));
         
-        this.buttonList.add(new GuiButton(8, this.width / 2 - 100, this.height / 4 + 72 + i, "Mods"));
+        this.buttonList.add(new GuiButton(0, LEFT_START + 6 + 4, 36, WIDTH - 12 - 8, 20, "OPTIONS"));
         
-
-        this.buttonList.add(new GuiButton(100, this.width / 2 + 2, this.height / 4 + 96 + i, 98, 20, "Server List"));
+        this.buttonList.add(new GuiButton(6, LEFT_START + 6 + 4, 36 + 20 + 5, WIDTH - 12 - 8, 20, "STATISTICS"));
         
-        this.buttonList.add(new GuiButton(5, this.width / 2 - 100, this.height / 4 + 48 + i, 98, 20, I18n.format("gui.achievements", new Object[0])));
-        this.buttonList.add(new GuiButton(6, this.width / 2 + 2, this.height / 4 + 48 + i, 98, 20, I18n.format("gui.stats", new Object[0])));
+        this.buttonList.add(new GuiButton(8, LEFT_START + 6 + 4, 36 + 40 + 10, WIDTH - 12 - 8, 20, "MODS"));
+        
+        this.buttonList.add(new GuiButton(1, LEFT_START + 6 + 4, 36 + 60 + 15, WIDTH - 12 - 8, 20, "SAVE & EXIT"));   
+               
+        this.buttonList.add(new GuiButton(4, 4, 4, 12, 12, "<"));
     }
 
     /**
@@ -58,24 +51,11 @@ public class GuiIngameMenu extends GuiScreen
                 break;
 
             case 1:
-                boolean flag = this.mc.isIntegratedServerRunning();
-                boolean flag1 = this.mc.isConnectedToRealms();
                 button.enabled = false;
                 this.mc.theWorld.sendQuittingDisconnectingPacket();
                 this.mc.loadWorld((WorldClient)null);
 
-                if (flag)
-                {
-                    this.mc.displayGuiScreen(new WizClientMainMenu());
-                }
-                else if (flag1)
-                {
-
-                }
-                else
-                {
-                    this.mc.displayGuiScreen(new GuiMultiplayer(new WizClientMainMenu()));
-                }
+                this.mc.displayGuiScreen(new GuiMainMenu());
 
             case 2:
             case 3:
@@ -87,10 +67,6 @@ public class GuiIngameMenu extends GuiScreen
                 this.mc.setIngameFocus();
                 break;
 
-            case 5:
-                this.mc.displayGuiScreen(new GuiAchievements(this, this.mc.thePlayer.getStatFileWriter()));
-                break;
-
             case 6:
                 this.mc.displayGuiScreen(new GuiStats(this, this.mc.thePlayer.getStatFileWriter()));
                 break;
@@ -99,22 +75,10 @@ public class GuiIngameMenu extends GuiScreen
                 this.mc.displayGuiScreen(new GuiModToggle());
                 
             case 8:
-            	//this.mc.displayGuiScreen(new ModListGui());
+            	// this.mc.displayGuiScreen(new ModListGui());
             	this.mc.displayGuiScreen(new GuiModToggle());
             	break;
-            	
-            case 100:
-            	this.mc.displayGuiScreen(new GuiMultiplayerIngame());
         }
-    }
-
-    /**
-     * Called from the main game loop to update the screen.
-     */
-    public void updateScreen()
-    {
-        super.updateScreen();
-        ++this.field_146444_f;
     }
 
     /**
@@ -122,10 +86,27 @@ public class GuiIngameMenu extends GuiScreen
      */
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
-        this.drawDefaultBackground();
+        // this.drawDefaultBackground();
         
-        this.drawCenteredString(this.fontRendererObj, I18n.format("WizClient", new Object[0]), this.width / 2, 40, 16777215);
-        //this.drawCenteredString(this.fontRendererObj, I18n.format("menu.game", new Object[0]), this.width / 2, 40, 16777215);
+        // Paper doll
+        GuiInventory.drawEntityOnScreen(width - 75, MathHelper.floor_float(height / 1.1f), MathHelper.floor_float(height / 2.5f), mouseX, mouseY, mc.thePlayer);
+        
+        // Navbar
+     	Gui.drawRelRect(0, 0, GuiScreen.width, 20, Palette.GRAY);
+     	Gui.drawRelRect(0, 20, GuiScreen.width, 2, Palette.GRAY_DARK);
+     	Gui.drawRelRect(0, 22, GuiScreen.width, 1, Palette.BLACK);
+     	this.mc.fontRendererObj.drawString("Resume Game", 19, 10 - (mc.fontRendererObj.FONT_HEIGHT / 2), Palette.TEXT_DARK);
+        
+     	int my = 6;
+     	int imx = 6;
+        Gui.drawRelRect(LEFT_START, 30, WIDTH, height - 31 - my, Palette.BLACK);
+        Gui.drawRelRect(LEFT_START + 1, 31, WIDTH - 2, height - 31 - my, Palette.GRAY);
+        Palette.drawGlint(LEFT_START + 1, 31, WIDTH - 2, height - 31 - my, Palette.GRAY_LIGHT, Palette.GRAY_DARK);
+        Gui.drawRelRect(LEFT_START + imx, 34, WIDTH - (imx * 2), height - 40 - my, Palette.BLACK);
+        Palette.drawGlint(LEFT_START + imx, 34, WIDTH - (imx * 2), height - 40 - my, Palette.GRAY_DARK, Palette.GRAY_LIGHT);
+        
+        // TODO: dont render hotbar.
+     	
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 }

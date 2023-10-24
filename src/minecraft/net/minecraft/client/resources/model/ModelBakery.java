@@ -85,11 +85,17 @@ public class ModelBakery
 
     public IRegistry<ModelResourceLocation, IBakedModel> setupModelRegistry()
     {
+    	System.out.println("g1");
         this.loadVariantItemModels();
+        System.out.println("g1.1");
         this.loadModelsCheck();
+        System.out.println("g1.2");
         this.loadSprites();
+        System.out.println("g1.3");
         this.bakeItemModels();
+        System.out.println("g1.4");
         this.bakeBlockModels();
+        System.out.println("g1.5");
         return this.bakedRegistry;
     }
 

@@ -5,7 +5,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.mojang.authlib.GameProfile;
 
-import WizClient.ui.WizClientMainMenu;
+import WizClient.GuiBedrockPlay;
 import io.netty.buffer.Unpooled;
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +34,7 @@ import net.minecraft.client.gui.GuiYesNo;
 import net.minecraft.client.gui.GuiYesNoCallback;
 import net.minecraft.client.gui.IProgressMeter;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
+import net.minecraft.client.multiplayer.GuiConnecting;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
@@ -281,7 +282,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
         this.gameController.gameSettings.hideGUI = packetIn.getDifficulty();
         this.gameController.loadWorld(this.clientWorldController);
         this.gameController.thePlayer.dimension = packetIn.getDimension();
-        this.gameController.displayGuiScreen(new GuiDownloadTerrain(this));
+        this.gameController.displayGuiScreen(new GuiConnecting(this.gameController, this));
         this.gameController.thePlayer.setEntityId(packetIn.getEntityId());
         this.currentServerMaxPlayers = packetIn.getMaxPlayers();
         this.gameController.thePlayer.setReducedDebug(packetIn.isReducedDebugInfo());
@@ -800,7 +801,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
         }
         else
         {
-            this.gameController.displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new WizClientMainMenu()), "disconnect.lost", reason));
+            this.gameController.displayGuiScreen(new GuiDisconnected(new GuiBedrockPlay(new GuiMainMenu()), "disconnect.lost", reason));
         }
     }
 
@@ -1058,7 +1059,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
             this.clientWorldController.setWorldScoreboard(scoreboard);
             this.gameController.loadWorld(this.clientWorldController);
             this.gameController.thePlayer.dimension = packetIn.getDimensionID();
-            this.gameController.displayGuiScreen(new GuiDownloadTerrain(this));
+            this.gameController.displayGuiScreen(new GuiConnecting(this.gameController, this));
         }
 
         this.gameController.setDimensionAndSpawnPlayer(packetIn.getDimensionID());

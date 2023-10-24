@@ -1,6 +1,7 @@
 package WizClient.ui.auth;
 
 import java.util.UUID;
+import java.util.concurrent.Callable;
 
 import com.mojang.authlib.Agent;
 import com.mojang.authlib.AuthenticationService;
@@ -8,6 +9,7 @@ import com.mojang.authlib.UserAuthentication;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import com.mojang.util.UUIDTypeAdapter;
 
+import WizClient.LoadingPopup;
 import WizClient.util.openauth.microsoft.MicrosoftAuthResult;
 import WizClient.util.openauth.microsoft.MicrosoftAuthenticationException;
 import WizClient.util.openauth.microsoft.MicrosoftAuthenticator;
@@ -56,24 +58,30 @@ public class SessionChanger {
 
 	}
 	
-	public void setUserMicrosoft(String email, String password) {
-		this.setUserMicrosoft();
-	}
-	
-	public void setUserMicrosoft() {
+	public void setUserMicrosoft(Callable<Object> cb) {
 		System.out.println("We got here #1");
 		MicrosoftAuthenticator authenticator = new MicrosoftAuthenticator();
 		authenticator.loginWithAsyncWebview().thenAcceptAsync(acc -> {
 	    	Minecraft.getMinecraft().gameSettings.refreshToken = acc.getRefreshToken();
 			Minecraft.getMinecraft().session = new Session(acc.getProfile().getName(), acc.getProfile().getId(), acc.getAccessToken(), "legacy");
+			try {
+				cb.call();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
 		}).exceptionally(e -> {
 			System.out.println("We got here #10");
 			System.out.println(e.toString());
+			try {
+				cb.call();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
 			return null;
 		});
 	}
 
-	/*public void setUserMicrosoft(String email, String password) {
+	public void setUserMicrosoft(String email, String password) {
 		System.out.println("We got here #1");
 		MicrosoftAuthenticator authenticator = new MicrosoftAuthenticator();
 		try {
@@ -84,7 +92,7 @@ public class SessionChanger {
 			System.out.println("We got here #10");
 			System.out.println(e.toString());
 		}
-	}*/
+	}
 
 	//Sets the session.
 	//You need to make this public, and remove the final modifier on the session Object.

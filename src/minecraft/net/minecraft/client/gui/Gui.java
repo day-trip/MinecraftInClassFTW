@@ -11,7 +11,7 @@ import net.minecraft.util.ResourceLocation;
 
 public class Gui
 {
-    public static final ResourceLocation optionsBackground = new ResourceLocation("WizClient/gui/options_background.png");
+    public static final ResourceLocation optionsBackground = new ResourceLocation("textures/gui/options_background.png");
     public static final ResourceLocation statIcons = new ResourceLocation("textures/gui/container/stats_icons.png");
     public static final ResourceLocation icons = new ResourceLocation("textures/gui/icons.png");
     protected float zLevel;
@@ -44,6 +44,25 @@ public class Gui
         }
 
         drawRect(x, startY + 1, x + 1, endY, color);
+    }
+    
+    public static void drawRelHollowRect(int x, int y, int width, int height, int owidth, int color) {
+    	Gui.drawHollowRect(x, y, x + width, y + height, owidth, color);
+    }
+    
+    public static void drawHollowRect(int left, int top, int right, int bottom, int width, int color) {
+    	Gui.drawRect(left, top, left + width, bottom, color);
+    	Gui.drawRect(right, top, right - width, bottom, color);
+    	Gui.drawRect(left, top, right, top + width, color);
+    	Gui.drawRect(left, bottom, right, bottom - width, color);
+    }
+    
+    public static void drawRelRectCentered(int x, int y, int width, int height, int color) {
+    	Gui.drawRelRect(x - (width / 2), y - (height / 2), width, height, color);
+    }
+    
+    public static void drawRelRect(int x, int y, int width, int height, int color) {
+    	Gui.drawRect(x, y, x + width, y + height, color);
     }
 
     /**

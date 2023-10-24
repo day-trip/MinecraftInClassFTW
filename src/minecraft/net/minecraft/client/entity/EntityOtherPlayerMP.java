@@ -21,7 +21,7 @@ public class EntityOtherPlayerMP extends AbstractClientPlayer
 
     public EntityOtherPlayerMP(World worldIn, GameProfile gameProfileIn)
     {
-        super(worldIn, gameProfileIn);
+        super(worldIn, gameProfileIn, false);
         this.stepHeight = 0.0F;
         this.noClip = true;
         this.renderOffsetY = 0.25F;

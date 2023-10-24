@@ -1,9 +1,9 @@
 package WizClient.ui.auth;
 
-import WizClient.ui.WizClientMainMenu;
 import WizClient.ui.auth.microsoft.GuiLoginMicrosoft;
 import WizClient.ui.auth.mojang.GuiLoginMojang;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 
 public class AltManagerGui extends GuiScreen {
@@ -28,7 +28,7 @@ public class AltManagerGui extends GuiScreen {
     @Override
     protected void actionPerformed(GuiButton button) {
         if (button.id == 0) {
-            mc.displayGuiScreen(new WizClientMainMenu());
+            mc.displayGuiScreen(new GuiMainMenu());
         }
         if(button.id == 1){
             mc.displayGuiScreen(new GuiLogin());

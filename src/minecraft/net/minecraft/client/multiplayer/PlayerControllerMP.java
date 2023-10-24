@@ -6,6 +6,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityHorse;
@@ -486,7 +487,7 @@ public class PlayerControllerMP
 
     public EntityPlayerSP func_178892_a(World worldIn, StatFileWriter statWriter)
     {
-        return new EntityPlayerSP(this.mc, worldIn, this.netClientHandler, statWriter);
+        return new EntityPlayerSP(this.mc, worldIn, this.netClientHandler, this.netClientHandler.getGameProfile(), statWriter);
     }
 
     /**

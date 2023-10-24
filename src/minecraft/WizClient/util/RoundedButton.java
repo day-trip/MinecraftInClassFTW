@@ -35,11 +35,11 @@ public class RoundedButton extends GuiButton {
             //drawRect(this.xPosition, this.yPosition, this.xPosition + this.width, this.yPosition + this.height, 0x44000000);
             //RoundUtils.drawRoundedRect(this.xPosition, this.yPosition, this.xPosition + this.width, this.yPosition + this.height, 5, 0x44000000);
 
-            GuiUtils.drawRoundedRect(this.xPosition, this.yPosition, this.xPosition + this.width, this.yPosition + this.height, this.radius, 0x44000000);
+            GuiUtils.drawRoundedRect(this.x, this.yPosition, this.x + this.width, this.yPosition + this.height, this.radius, 0x44000000);
 
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
-            this.hovered = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+            this.hovered = mouseX >= this.x && mouseY >= this.yPosition && mouseX < this.x + this.width && mouseY < this.yPosition + this.height;
             int i = this.getHoverState(this.hovered);
 
             GlStateManager.enableBlend();
@@ -59,7 +59,7 @@ public class RoundedButton extends GuiButton {
                 j = 16777120;
             }
 
-            this.drawCenteredString(fontrenderer, this.displayString, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, j);
+            this.drawCenteredString(fontrenderer, this.displayString, this.x + this.width / 2, this.yPosition + (this.height - 8) / 2, j);
             GlStateManager.disableBlend();
         }
 	}
@@ -85,7 +85,7 @@ public class RoundedButton extends GuiButton {
      */
     public boolean mousePressed(Minecraft mc, int mouseX, int mouseY)
     {
-        return this.enabled && this.visible && mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+        return this.enabled && this.visible && mouseX >= this.x && mouseY >= this.yPosition && mouseX < this.x + this.width && mouseY < this.yPosition + this.height;
     }
 
     /**

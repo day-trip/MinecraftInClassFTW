@@ -2,6 +2,9 @@ package net.minecraft.server.integrated;
 
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Futures;
+
+import WizClient.ScreenTripper;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -10,6 +13,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.multiplayer.GuiConnecting;
 import net.minecraft.client.multiplayer.ThreadLanServerPing;
 import net.minecraft.command.ServerCommandManager;
 import net.minecraft.crash.CrashReport;
@@ -39,6 +44,7 @@ import net.optifine.ClearWater;
 import net.optifine.reflect.Reflector;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.input.Mouse;
 
 public class IntegratedServer extends MinecraftServer
 {
@@ -65,6 +71,7 @@ public class IntegratedServer extends MinecraftServer
     public IntegratedServer(Minecraft mcIn, String folderName, String worldName, WorldSettings settings)
     {
         super(new File(mcIn.mcDataDir, "saves"), mcIn.getProxy(), new File(mcIn.mcDataDir, USER_CACHE_FILE.getName()));
+        System.out.println("sup'");
         this.setServerOwner(mcIn.getSession().getUsername());
         this.setFolderName(folderName);
         this.setWorldName(worldName);
@@ -76,6 +83,8 @@ public class IntegratedServer extends MinecraftServer
         this.theWorldSettings = this.isDemo() ? DemoWorldServer.demoWorldSettings : settings;
         ISaveHandler isavehandler = this.getActiveAnvilConverter().getSaveLoader(folderName, false);
         WorldInfo worldinfo = isavehandler.loadWorldInfo();
+        
+        System.out.println("sup' 2");
 
         if (worldinfo != null)
         {
@@ -85,7 +94,17 @@ public class IntegratedServer extends MinecraftServer
             {
                 int i = nbttagcompound.getInteger("Dimension");
                 PacketThreadUtil.lastDimensionId = i;
-                this.mc.loadingScreen.setLoadingProgress(-1);
+                // this.mc.loadingScreen.setLoadingProgress(-1);
+                /*mc.displayGuiScreen(new GuiConnecting(mc));
+                System.out.println("sup' 2.5");
+                mc.currentScreen.updateScreen();
+                mc.currentScreen.drawScreen(Mouse.getX(), Mouse.getY(), 0);*/
+                /*GuiConnecting s = new GuiConnecting(mc);
+                ScaledResolution sr = new ScaledResolution(mc);
+                s.setWorldAndResolution(mc, sr.getScaledWidth(), sr.getScaledHeight());
+                s.updateScreen();
+                s.drawScreen(2, 2, 0);*/
+                ScreenTripper.tripScreen(new GuiConnecting(mc));
             }
         }
     }

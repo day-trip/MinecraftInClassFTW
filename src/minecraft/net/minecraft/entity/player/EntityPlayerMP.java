@@ -165,7 +165,7 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
 
     public EntityPlayerMP(MinecraftServer server, WorldServer worldIn, GameProfile profile, ItemInWorldManager interactionManager)
     {
-        super(worldIn, profile);
+        super(worldIn, profile, false);
         interactionManager.thisPlayerMP = this;
         this.theItemInWorldManager = interactionManager;
         BlockPos blockpos = worldIn.getSpawnPoint();

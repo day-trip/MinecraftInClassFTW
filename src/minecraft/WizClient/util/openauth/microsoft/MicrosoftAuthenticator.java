@@ -183,7 +183,7 @@ public class MicrosoftAuthenticator
      */
     public CompletableFuture<MicrosoftAuthResult> loginWithAsyncWebview()
     {
-        String url = String.format("%s?%s", MICROSOFT_AUTHORIZATION_ENDPOINT, http.buildParams(getLoginParams()));
+        String url = String.format("%s?%s", MICROSOFT_AUTHORIZATION_ENDPOINT, http.buildParams(getLoginParams())); // its static, da dream is alive
         LoginFrame frame = new LoginFrame();
     
         return frame.start(url).thenApplyAsync(result -> {

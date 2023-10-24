@@ -173,14 +173,16 @@ public abstract class EntityPlayer extends EntityLivingBase
      */
     public EntityFishHook fishEntity;
 
-    public EntityPlayer(World worldIn, GameProfile gameProfileIn)
+    public EntityPlayer(World worldIn, GameProfile gameProfileIn, boolean mock)
     {
         super(worldIn);
         this.entityUniqueID = getUUID(gameProfileIn);
         this.gameProfile = gameProfileIn;
-        this.inventoryContainer = new ContainerPlayer(this.inventory, !worldIn.isRemote, this);
-        this.openContainer = this.inventoryContainer;
-        BlockPos blockpos = worldIn.getSpawnPoint();
+        if (!mock) {
+        	this.inventoryContainer = new ContainerPlayer(this.inventory, !worldIn.isRemote, this);
+            this.openContainer = this.inventoryContainer;
+        }
+        BlockPos blockpos = mock ? new BlockPos(0, 0, 0) : worldIn.getSpawnPoint();
         this.setLocationAndAngles((double)blockpos.getX() + 0.5D, (double)(blockpos.getY() + 1), (double)blockpos.getZ() + 0.5D, 0.0F, 0.0F);
         this.unused180 = 180.0F;
         this.fireResistance = 20;
@@ -265,13 +267,10 @@ public abstract class EntityPlayer extends EntityLivingBase
      */
     public void onUpdate()
     {
-        this.noClip = this.isSpectator();
-
-        if (this.isSpectator())
-        {
-            this.onGround = false;
-        }
-
+    	this.noClip = this.isSpectator();
+    	if (this.isSpectator()) {
+    		this.onGround = false;
+    	}
         if (this.itemInUse != null)
         {
             ItemStack itemstack = this.inventory.getCurrentItem();
